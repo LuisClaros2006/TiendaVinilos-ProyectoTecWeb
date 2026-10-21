@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="VinylStore.Api/VinylStore.Api.csproj" />
+  <Project Path="VinylStore.Core/VinylStore.Core.csproj" />
+  <Project Path="VinylStore.Infrastructure/VinylStore.Infrastructure.csproj" />
+  <Project Path="VinylStore.Services/VinylStore.Services.csproj" />
+</Solution>

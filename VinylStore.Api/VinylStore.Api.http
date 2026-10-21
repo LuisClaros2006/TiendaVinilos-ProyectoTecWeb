@@ -1,0 +1,6 @@
+@VinylStore.Api_HostAddress = http://localhost:5015
+
+GET {{VinylStore.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
