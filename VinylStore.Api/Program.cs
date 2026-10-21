@@ -20,8 +20,14 @@ namespace VinylStore.Api
 
             // Add services to the container.
             builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+            builder.Services.AddScoped<IVinylRepository, VinylRepository>();
 
-            builder.Services.AddControllers();
+
+            // builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+            });
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
