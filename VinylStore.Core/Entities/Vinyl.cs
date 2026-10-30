@@ -1,12 +1,11 @@
-﻿using System.Text.Json.Serialization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace VinylStore.Core.Entities;
 
-public partial class Vinyl
+public partial class Vinyl : BaseEntity
 {
-    public int VinylId { get; set; }
+    // public int Id { get; set; }
 
     public int AlbumId { get; set; }
 
@@ -30,12 +29,11 @@ public partial class Vinyl
 
     public DateTime CreatedAt { get; set; }
 
-    [JsonIgnore]
     public virtual Album Album { get; set; } = null!;
 
-    [JsonIgnore]
     public virtual Genre Genre { get; set; } = null!;
 
-    [JsonIgnore]
+    public virtual ICollection<Inventorymovement> Inventorymovements { get; set; } = new List<Inventorymovement>();
+
     public virtual ICollection<Saledetail> Saledetails { get; set; } = new List<Saledetail>();
 }

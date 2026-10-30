@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace VinylStore.Core.Entities;
 
-public partial class Customer
+public partial class Customer : BaseEntity
 {
-    public int CustomerId { get; set; }
+    // public int Id { get; set; }
 
     public string FirstName { get; set; } = null!;
 

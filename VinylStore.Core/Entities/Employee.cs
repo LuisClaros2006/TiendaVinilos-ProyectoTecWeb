@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace VinylStore.Core.Entities;
 
-public partial class Employee
+public partial class Employee : BaseEntity
 {
-    public int EmployeeId { get; set; }
+    // public int Id { get; set; }
 
     public string FirstName { get; set; } = null!;
 
@@ -20,6 +20,8 @@ public partial class Employee
     public bool? IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public virtual ICollection<Inventorymovement> Inventorymovements { get; set; } = new List<Inventorymovement>();
 
     public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
 }

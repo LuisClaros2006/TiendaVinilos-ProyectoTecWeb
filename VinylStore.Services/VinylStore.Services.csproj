@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\VinylStore.Core\VinylStore.Core.csproj" />
+    <ProjectReference Include="..\VinylStore.Infrastructure\VinylStore.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

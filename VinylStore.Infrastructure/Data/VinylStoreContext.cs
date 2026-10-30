@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using VinylStore.Core.Entities;
 // using VinylStore.Infrastructure.Entities;
+using VinylStore.Core.Entities;
 
 namespace VinylStore.Infrastructure.Data;
 
 public partial class VinylStoreContext : DbContext
 {
-    public VinylStoreContext()
-    {
-
-    }
-
     public VinylStoreContext(DbContextOptions<VinylStoreContext> options)
         : base(options)
     {
@@ -28,6 +23,8 @@ public partial class VinylStoreContext : DbContext
 
     public virtual DbSet<Genre> Genres { get; set; }
 
+    public virtual DbSet<Inventorymovement> Inventorymovements { get; set; }
+
     public virtual DbSet<Sale> Sales { get; set; }
 
     public virtual DbSet<Saledetail> Saledetails { get; set; }
@@ -42,12 +39,13 @@ public partial class VinylStoreContext : DbContext
 
         modelBuilder.Entity<Album>(entity =>
         {
-            entity.HasKey(e => e.AlbumId).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("album");
 
             entity.HasIndex(e => e.ArtistId, "IX_Album_ArtistId");
 
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Title).HasMaxLength(200);
 
             entity.HasOne(d => d.Artist).WithMany(p => p.Albums)
@@ -58,21 +56,23 @@ public partial class VinylStoreContext : DbContext
 
         modelBuilder.Entity<Artist>(entity =>
         {
-            entity.HasKey(e => e.ArtistId).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("artist");
 
             entity.HasIndex(e => e.Name, "UQ_Artist_Name").IsUnique();
 
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Name).HasMaxLength(150);
         });
 
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.HasKey(e => e.CustomerId).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("customer");
 
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Address).HasMaxLength(250);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -88,12 +88,13 @@ public partial class VinylStoreContext : DbContext
 
         modelBuilder.Entity<Employee>(entity =>
         {
-            entity.HasKey(e => e.EmployeeId).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("employee");
 
             entity.HasIndex(e => e.Email, "UQ_Employee_Email").IsUnique();
 
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime");
@@ -111,18 +112,54 @@ public partial class VinylStoreContext : DbContext
 
         modelBuilder.Entity<Genre>(entity =>
         {
-            entity.HasKey(e => e.GenreId).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("genre");
 
             entity.HasIndex(e => e.Name, "UQ_Genre_Name").IsUnique();
 
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Name).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<Inventorymovement>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("inventorymovement");
+
+            entity.HasIndex(e => e.EmployeeId, "IX_InventoryMovement_EmployeeId");
+
+            entity.HasIndex(e => e.MovementDate, "IX_InventoryMovement_MovementDate");
+
+            entity.HasIndex(e => e.SaleId, "IX_InventoryMovement_SaleId");
+
+            entity.HasIndex(e => e.VinylId, "IX_InventoryMovement_VinylId");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.MovementDate)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime");
+            entity.Property(e => e.MovementType).HasColumnType("enum('INITIAL','RESTOCK','ADJUSTMENT','SALE','SALE_CANCELLATION')");
+            entity.Property(e => e.Reason).HasMaxLength(250);
+
+            entity.HasOne(d => d.Employee).WithMany(p => p.Inventorymovements)
+                .HasForeignKey(d => d.EmployeeId)
+                .HasConstraintName("FK_InventoryMovement_Employee");
+
+            entity.HasOne(d => d.Sale).WithMany(p => p.Inventorymovements)
+                .HasForeignKey(d => d.SaleId)
+                .HasConstraintName("FK_InventoryMovement_Sale");
+
+            entity.HasOne(d => d.Vinyl).WithMany(p => p.Inventorymovements)
+                .HasForeignKey(d => d.VinylId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_InventoryMovement_Vinyl");
         });
 
         modelBuilder.Entity<Sale>(entity =>
         {
-            entity.HasKey(e => e.SaleId).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("sale");
 
@@ -132,6 +169,7 @@ public partial class VinylStoreContext : DbContext
 
             entity.HasIndex(e => e.SaleDate, "IX_Sale_SaleDate");
 
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CancelledAt).HasColumnType("datetime");
             entity.Property(e => e.SaleDate)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -154,7 +192,7 @@ public partial class VinylStoreContext : DbContext
 
         modelBuilder.Entity<Saledetail>(entity =>
         {
-            entity.HasKey(e => e.SaleDetailId).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("saledetail");
 
@@ -162,6 +200,7 @@ public partial class VinylStoreContext : DbContext
 
             entity.HasIndex(e => new { e.SaleId, e.VinylId }, "UQ_SaleDetail_Sale_Vinyl").IsUnique();
 
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.UnitPrice).HasPrecision(10, 2);
 
             entity.HasOne(d => d.Sale).WithMany(p => p.Saledetails)
@@ -177,7 +216,7 @@ public partial class VinylStoreContext : DbContext
 
         modelBuilder.Entity<Vinyl>(entity =>
         {
-            entity.HasKey(e => e.VinylId).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("vinyl");
 
@@ -187,6 +226,7 @@ public partial class VinylStoreContext : DbContext
 
             entity.HasIndex(e => e.Sku, "UQ_Vinyl_Sku").IsUnique();
 
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CoverImageUrl).HasMaxLength(500);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")

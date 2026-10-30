@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace VinylStore.Core.Entities;
 
-public partial class Sale
+public partial class Sale : BaseEntity
 {
-    public int SaleId { get; set; }
+    // public int Id { get; set; }
 
     public int CustomerId { get; set; }
 
@@ -22,6 +22,8 @@ public partial class Sale
     public virtual Customer Customer { get; set; } = null!;
 
     public virtual Employee Employee { get; set; } = null!;
+
+    public virtual ICollection<Inventorymovement> Inventorymovements { get; set; } = new List<Inventorymovement>();
 
     public virtual ICollection<Saledetail> Saledetails { get; set; } = new List<Saledetail>();
 }
