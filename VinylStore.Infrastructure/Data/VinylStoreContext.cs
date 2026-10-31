@@ -6,9 +6,14 @@ using VinylStore.Core.Entities;
 
 namespace VinylStore.Infrastructure.Data;
 
+using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+using VinylStore.Core.Entities;
+
 public partial class VinylStoreContext : DbContext
 {
-    public VinylStoreContext(DbContextOptions<VinylStoreContext> options)
+    public VinylStoreContext(
+        DbContextOptions<VinylStoreContext> options)
         : base(options)
     {
     }
@@ -33,225 +38,14 @@ public partial class VinylStoreContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Configuración global de MySQL
         modelBuilder
             .UseCollation("utf8mb4_unicode_ci")
             .HasCharSet("utf8mb4");
 
-        modelBuilder.Entity<Album>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("album");
-
-            entity.HasIndex(e => e.ArtistId, "IX_Album_ArtistId");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Title).HasMaxLength(200);
-
-            entity.HasOne(d => d.Artist).WithMany(p => p.Albums)
-                .HasForeignKey(d => d.ArtistId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Album_Artist");
-        });
-
-        modelBuilder.Entity<Artist>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("artist");
-
-            entity.HasIndex(e => e.Name, "UQ_Artist_Name").IsUnique();
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Name).HasMaxLength(150);
-        });
-
-        modelBuilder.Entity<Customer>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("customer");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Address).HasMaxLength(250);
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Email).HasMaxLength(150);
-            entity.Property(e => e.FirstName).HasMaxLength(80);
-            entity.Property(e => e.IsActive)
-                .IsRequired()
-                .HasDefaultValueSql("'1'");
-            entity.Property(e => e.LastName).HasMaxLength(80);
-            entity.Property(e => e.Phone).HasMaxLength(30);
-        });
-
-        modelBuilder.Entity<Employee>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("employee");
-
-            entity.HasIndex(e => e.Email, "UQ_Employee_Email").IsUnique();
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Email).HasMaxLength(150);
-            entity.Property(e => e.FirstName).HasMaxLength(80);
-            entity.Property(e => e.IsActive)
-                .IsRequired()
-                .HasDefaultValueSql("'1'");
-            entity.Property(e => e.LastName).HasMaxLength(80);
-            entity.Property(e => e.PasswordHash).HasMaxLength(255);
-            entity.Property(e => e.Role)
-                .HasDefaultValueSql("'EMPLOYEE'")
-                .HasColumnType("enum('ADMIN','EMPLOYEE')");
-        });
-
-        modelBuilder.Entity<Genre>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("genre");
-
-            entity.HasIndex(e => e.Name, "UQ_Genre_Name").IsUnique();
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Name).HasMaxLength(100);
-        });
-
-        modelBuilder.Entity<Inventorymovement>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("inventorymovement");
-
-            entity.HasIndex(e => e.EmployeeId, "IX_InventoryMovement_EmployeeId");
-
-            entity.HasIndex(e => e.MovementDate, "IX_InventoryMovement_MovementDate");
-
-            entity.HasIndex(e => e.SaleId, "IX_InventoryMovement_SaleId");
-
-            entity.HasIndex(e => e.VinylId, "IX_InventoryMovement_VinylId");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.MovementDate)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.MovementType).HasColumnType("enum('INITIAL','RESTOCK','ADJUSTMENT','SALE','SALE_CANCELLATION')");
-            entity.Property(e => e.Reason).HasMaxLength(250);
-
-            entity.HasOne(d => d.Employee).WithMany(p => p.Inventorymovements)
-                .HasForeignKey(d => d.EmployeeId)
-                .HasConstraintName("FK_InventoryMovement_Employee");
-
-            entity.HasOne(d => d.Sale).WithMany(p => p.Inventorymovements)
-                .HasForeignKey(d => d.SaleId)
-                .HasConstraintName("FK_InventoryMovement_Sale");
-
-            entity.HasOne(d => d.Vinyl).WithMany(p => p.Inventorymovements)
-                .HasForeignKey(d => d.VinylId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_InventoryMovement_Vinyl");
-        });
-
-        modelBuilder.Entity<Sale>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("sale");
-
-            entity.HasIndex(e => e.CustomerId, "IX_Sale_CustomerId");
-
-            entity.HasIndex(e => e.EmployeeId, "IX_Sale_EmployeeId");
-
-            entity.HasIndex(e => e.SaleDate, "IX_Sale_SaleDate");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CancelledAt).HasColumnType("datetime");
-            entity.Property(e => e.SaleDate)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Status)
-                .HasDefaultValueSql("'COMPLETED'")
-                .HasColumnType("enum('COMPLETED','CANCELLED')");
-            entity.Property(e => e.Total).HasPrecision(12, 2);
-
-            entity.HasOne(d => d.Customer).WithMany(p => p.Sales)
-                .HasForeignKey(d => d.CustomerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Sale_Customer");
-
-            entity.HasOne(d => d.Employee).WithMany(p => p.Sales)
-                .HasForeignKey(d => d.EmployeeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Sale_Employee");
-        });
-
-        modelBuilder.Entity<Saledetail>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("saledetail");
-
-            entity.HasIndex(e => e.VinylId, "IX_SaleDetail_VinylId");
-
-            entity.HasIndex(e => new { e.SaleId, e.VinylId }, "UQ_SaleDetail_Sale_Vinyl").IsUnique();
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.UnitPrice).HasPrecision(10, 2);
-
-            entity.HasOne(d => d.Sale).WithMany(p => p.Saledetails)
-                .HasForeignKey(d => d.SaleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_SaleDetail_Sale");
-
-            entity.HasOne(d => d.Vinyl).WithMany(p => p.Saledetails)
-                .HasForeignKey(d => d.VinylId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_SaleDetail_Vinyl");
-        });
-
-        modelBuilder.Entity<Vinyl>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("vinyl");
-
-            entity.HasIndex(e => e.AlbumId, "IX_Vinyl_AlbumId");
-
-            entity.HasIndex(e => e.GenreId, "IX_Vinyl_GenreId");
-
-            entity.HasIndex(e => e.Sku, "UQ_Vinyl_Sku").IsUnique();
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CoverImageUrl).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.Edition).HasMaxLength(120);
-            entity.Property(e => e.Format)
-                .HasDefaultValueSql("'LP'")
-                .HasColumnType("enum('LP','EP','SINGLE')");
-            entity.Property(e => e.IsActive)
-                .IsRequired()
-                .HasDefaultValueSql("'1'");
-            entity.Property(e => e.Price).HasPrecision(10, 2);
-            entity.Property(e => e.Sku).HasMaxLength(40);
-
-            entity.HasOne(d => d.Album).WithMany(p => p.Vinyls)
-                .HasForeignKey(d => d.AlbumId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Vinyl_Album");
-
-            entity.HasOne(d => d.Genre).WithMany(p => p.Vinyls)
-                .HasForeignKey(d => d.GenreId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Vinyl_Genre");
-        });
+        // Registrar las configuraciones automáticamente
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            Assembly.GetExecutingAssembly());
 
         OnModelCreatingPartial(modelBuilder);
     }
