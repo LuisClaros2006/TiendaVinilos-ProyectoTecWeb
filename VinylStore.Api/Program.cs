@@ -31,6 +31,7 @@ namespace VinylStore.Api
             builder.Services.AddScoped<IGenreService, GenreService>();
             builder.Services.AddScoped<IAlbumService, AlbumService>();
             builder.Services.AddScoped<IVinylService, VinylService>();
+            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
             // builder.Services.AddControllers();
             builder.Services.AddControllers(options =>
@@ -64,6 +65,10 @@ namespace VinylStore.Api
             builder.Services.AddScoped<VinylDtoValidator>();
             builder.Services.AddScoped<CrearVinylDtoValidator>();
             builder.Services.AddScoped<ActualizarVinylDtoValidator>();
+
+            builder.Services.AddScoped<EmployeeDtoValidator>();
+            builder.Services.AddScoped<CrearEmployeeDtoValidator>();
+            builder.Services.AddScoped<ActualizarEmployeeDtoValidator>();
 
             var app = builder.Build();
 
