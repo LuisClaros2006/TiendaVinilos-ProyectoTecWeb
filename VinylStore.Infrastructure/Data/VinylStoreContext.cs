@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 // using VinylStore.Infrastructure.Entities;
 using VinylStore.Core.Entities;
 
-namespace VinylStore.Infrastructure.Data;
-
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using VinylStore.Core.Entities;
+
+namespace VinylStore.Infrastructure.Data;
 
 public partial class VinylStoreContext : DbContext
 {
