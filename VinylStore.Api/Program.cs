@@ -24,6 +24,8 @@ namespace VinylStore.Api
 
             // Add services to the container.
             builder.Services.AddScoped(typeof(IBaseRepository<>),typeof(BaseRepository<>));
+            builder.Services.AddScoped<ISaleRepository, SaleRepository>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // IServices y Services
             builder.Services.AddScoped<ICustomerService, CustomerService>();
@@ -32,6 +34,7 @@ namespace VinylStore.Api
             builder.Services.AddScoped<IAlbumService, AlbumService>();
             builder.Services.AddScoped<IVinylService, VinylService>();
             builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+            builder.Services.AddScoped<ISaleService, SaleService>();
 
             // builder.Services.AddControllers();
             builder.Services.AddControllers(options =>
@@ -69,6 +72,9 @@ namespace VinylStore.Api
             builder.Services.AddScoped<EmployeeDtoValidator>();
             builder.Services.AddScoped<CrearEmployeeDtoValidator>();
             builder.Services.AddScoped<ActualizarEmployeeDtoValidator>();
+
+            builder.Services.AddScoped<SaleDtoValidator>();
+            builder.Services.AddScoped<CrearSaleDtoValidator>();
 
             var app = builder.Build();
 
